@@ -36,6 +36,7 @@
   "author": "",
   "dependencies": {
     "@babel/runtime": "^7.7.7",
+    "@reduxjs/toolkit": "^1.8.6",
     "@tarojs/components": "3.5.6",
     "@tarojs/helper": "3.5.6",
     "@tarojs/plugin-framework-react": "3.5.6",
@@ -55,6 +56,7 @@
     "postcss": "7.x",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
+    "react-redux": "^8.0.4",
     "taro-plugin-tailwind": "^1.2.8",
     "taro-ui": "^3.1.0-beta.2"
   },

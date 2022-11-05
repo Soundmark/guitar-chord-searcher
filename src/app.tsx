@@ -1,6 +1,8 @@
 import { Component, PropsWithChildren } from "react";
+import { Provider } from "react-redux";
 import "windi.css";
 import "./app.less";
+import store from "./store";
 
 class App extends Component<PropsWithChildren> {
   componentDidMount() {}
@@ -11,7 +13,7 @@ class App extends Component<PropsWithChildren> {
 
   // this.props.children 是将要会渲染的页面
   render() {
-    return this.props.children;
+    return <Provider store={store}>{this.props.children}</Provider>;
   }
 }
 
