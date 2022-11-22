@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import { indexModel } from "@/models";
+import { findLastIndex } from "@/utils/lastIndex";
 import { Button, Canvas, Picker, View } from "@tarojs/components";
 import Taro from "@tarojs/taro";
 import { useEffect, useMemo, useState } from "react";
@@ -63,15 +64,22 @@ function SettingModal() {
       if (!target) return;
       setFirstTab(target.firstTab);
 
-      if (target.spanTab) {
-        const xPos = 15 + (target.spanTab.x - 1) * xDiff;
-        const yPos = 15 + target.spanTab.y * yDiff - 0.5 * yDiff;
-        ctx.beginPath();
-        ctx.setLineWidth(4);
-        ctx.moveTo(xPos, yPos);
-        ctx.lineTo(xPos + (target.spanTab.span - 1) * xDiff, yPos);
-        ctx.stroke();
-        ctx.setLineWidth(2);
+      if (target.finger) {
+        for (let i = 1; i <= 4; i++) {
+          if (target.finger.filter((item) => item === i).length > 1) {
+            const x = target.finger.findIndex((item) => item === i)! + 1;
+            const span = findLastIndex(target.finger, i) - x + 2;
+            const y = target.chords[x - 1];
+            const xPos = 15 + (x - 1) * xDiff;
+            const yPos = 15 + y * yDiff - 0.5 * yDiff;
+            ctx.beginPath();
+            ctx.setLineWidth(4);
+            ctx.moveTo(xPos, yPos);
+            ctx.lineTo(xPos + (span - 1) * xDiff, yPos);
+            ctx.stroke();
+            ctx.setLineWidth(2);
+          }
+        }
       }
 
       target.chords.forEach((item, index) => {
