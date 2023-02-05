@@ -1,16 +1,11 @@
 module.exports = {
-    prefixer: false,
-    compile: false,
-    globalUtility: false,
-    darkMode: 'media',
-    corePlugins: {
-        preflight: false,
-        divideColor: false,
-        divideOpacity: false,
-        divideStyle: false,
-        divideWidth: false,
-        space: false,
-        placeholderColor: false,
-        placeholderOpacity: false,
-    },
+  prefixer: false,
+  extract: {
+    // 忽略部分文件夹
+    exclude: ["node_modules", ".git", "dist"],
+  },
+  corePlugins: {
+    // 禁用掉在小程序环境中不可能用到的 plugins
+    container: false,
+  },
 };
