@@ -5,8 +5,7 @@ export type ChordSetting = Record<
     {
       firstTab: number;
       chords: number[];
-      finger?: number[];
-      spanTab?: { x: number; y: number; span: number };
+      finger: number[];
     }
   >
 >;
