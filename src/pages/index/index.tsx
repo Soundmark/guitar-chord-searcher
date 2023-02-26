@@ -1,19 +1,14 @@
 import { indexModel } from "@/models";
+import { Field } from "@antmjs/vantui";
 import { View } from "@tarojs/components";
+import Taro from "@tarojs/taro";
 import { useState } from "react";
-import { AtInput } from "taro-ui";
-import "taro-ui/dist/style/components/icon.scss";
-import "taro-ui/dist/style/components/modal.scss";
 import ChordModal from "./ChordModal";
 import "./index.less";
 import MetronomeModal from "./MetronomeModal";
-import SettingModal from "./SettingModal";
 
 export default function Index() {
   const [searchValue, setSearchValue] = useState("");
-  const [searchBtnDisplay, setSearchBtnDisplay] = useState<
-    "none" | "inline-block"
-  >("none");
 
   const buttonConfig = [
     {
@@ -44,7 +39,7 @@ export default function Index() {
   ];
 
   return (
-    <View className="h-full relative">
+    <View className="h-screen relative">
       <View className="absolute w-full top-1/2 transform -translate-y-28 transition-transform">
         <View className="text-center">
           <View className="at-icon at-icon-map-pin text-5xl text-yellow-500"></View>
@@ -53,23 +48,30 @@ export default function Index() {
           <View className="inline-block w-8 h-8 rounded-full leading-8 text-center bg-yellow-700">
             中
           </View>
-          <AtInput
+          <View className="inline-block" style="width:calc(100% - 4.5rem);">
+            <Field style="padding:0.5rem 0.7rem;"></Field>
+          </View>
+          {/* <AtInput
             className="inline-block px-1"
             name="searchValue"
             value={searchValue}
             onChange={(val: string) => {
               setSearchValue(val);
             }}
-            onFocus={() => {
-              setSearchBtnDisplay("inline-block");
-            }}
-            onBlur={() => {
-              setSearchBtnDisplay("none");
-            }}
-          ></AtInput>
+          ></AtInput> */}
           <View
-            className="at-icon at-icon-search w-8 h-8 rounded-full text-center text-xl before:flex before:justify-center before:items-center before:h-full"
-            style={`display:${searchBtnDisplay};vertical-align:top;`}
+            className="at-icon at-icon-search w-8 h-8 rounded-full text-center text-xl before:flex before:justify-center before:items-center before:h-full inline-block"
+            style="vertical-align:top;"
+            onClick={() => {
+              Taro.request({
+                url: "https://www.ultimate-guitar.com/search.php?title=mika&page=1&type=300",
+
+                success: (res) => {
+                  console.log(res.data);
+                },
+              });
+              Taro.navigateTo({ url: "/pages/List/index" });
+            }}
           ></View>
         </View>
         <View className="px-4">
@@ -88,7 +90,7 @@ export default function Index() {
           ))}
         </View>
       </View>
-      <SettingModal></SettingModal>
+      {/* <SettingModal></SettingModal> */}
       <ChordModal></ChordModal>
       <MetronomeModal></MetronomeModal>
     </View>
