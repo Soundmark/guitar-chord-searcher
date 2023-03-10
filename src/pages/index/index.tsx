@@ -1,14 +1,14 @@
 import { indexModel } from "@/models";
-import { Field } from "@antmjs/vantui";
+import { Field, Icon } from "@antmjs/vantui";
 import { View } from "@tarojs/components";
 import Taro from "@tarojs/taro";
-import { useState } from "react";
+import { useSelector } from "react-redux";
 import ChordModal from "./ChordModal";
 import "./index.less";
 import MetronomeModal from "./MetronomeModal";
 
 export default function Index() {
-  const [searchValue, setSearchValue] = useState("");
+  const { searchValue } = useSelector(indexModel.selector);
 
   const buttonConfig = [
     {
@@ -44,35 +44,39 @@ export default function Index() {
         <View className="text-center">
           <View className="at-icon at-icon-map-pin text-5xl text-yellow-500"></View>
         </View>
-        <View className="index-search-bar border-solid border-black border rounded-full w-11/12 p-1 mx-auto my-4">
-          <View className="inline-block w-8 h-8 rounded-full leading-8 text-center bg-yellow-700">
+        <View className="index-search-bar border-solid border-black border rounded-full w-11/12 p-1 mx-auto my-4 flex items-center">
+          <View className="w-8 h-8 rounded-full leading-8 text-center bg-yellow-700">
             中
           </View>
-          <View className="inline-block" style="width:calc(100% - 4.5rem);">
-            <Field style="padding:0.5rem 0.7rem;"></Field>
+          <View style="width:calc(100% - 4.5rem);">
+            <Field
+              style="padding:0.5rem 0.7rem;"
+              placeholder="输入搜索吉他谱"
+              value={searchValue}
+              onChange={(e) => {
+                indexModel.actions.update({ searchValue: e.detail });
+              }}
+              onConfirm={() => {
+                if (searchValue) {
+                  Taro.navigateTo({ url: "/pages/List/index" });
+                }
+              }}
+            ></Field>
           </View>
-          {/* <AtInput
-            className="inline-block px-1"
-            name="searchValue"
-            value={searchValue}
-            onChange={(val: string) => {
-              setSearchValue(val);
-            }}
-          ></AtInput> */}
           <View
-            className="at-icon at-icon-search w-8 h-8 rounded-full text-center text-xl before:flex before:justify-center before:items-center before:h-full inline-block"
-            style="vertical-align:top;"
+            className="w-8 h-8 text-center"
             onClick={() => {
-              Taro.request({
-                url: "https://www.ultimate-guitar.com/search.php?title=mika&page=1&type=300",
-
-                success: (res) => {
-                  console.log(res.data);
-                },
-              });
-              Taro.navigateTo({ url: "/pages/List/index" });
+              if (searchValue) {
+                Taro.navigateTo({ url: "/pages/List/index" });
+              }
             }}
-          ></View>
+          >
+            <Icon
+              name="search"
+              className="rounded-full text-center mt-1"
+              size="1.5rem"
+            ></Icon>
+          </View>
         </View>
         <View className="px-4">
           {buttonConfig.map((item) => (

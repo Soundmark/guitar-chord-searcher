@@ -4,6 +4,7 @@ interface Params {
   settingVisible: boolean;
   chordVisible: boolean;
   metronomeVisible: boolean;
+  searchValue: string;
 }
 
 export const indexModel = createModel<Params>({
@@ -12,5 +13,6 @@ export const indexModel = createModel<Params>({
     settingVisible: false,
     chordVisible: false,
     metronomeVisible: false,
+    searchValue: "",
   },
 });
