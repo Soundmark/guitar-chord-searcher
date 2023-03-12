@@ -5,6 +5,7 @@ interface Params {
   chordVisible: boolean;
   metronomeVisible: boolean;
   searchValue: string;
+  chordUrl?: string;
 }
 
 export const indexModel = createModel<Params>({
