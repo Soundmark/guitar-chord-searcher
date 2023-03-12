@@ -29,6 +29,7 @@ export const dealListData = (data: string) => {
             /(?:<a(\s|\n)(.|\n)*class="js-link-song"(.|\n)*>\s*).*(?:\s*<\/a>)/
           )?.[0]
           ?.replace(/(<a.*>)|(<\/a(.|\n)*>)|(<\/*b>)/g, "")
+          ?.replace("&nbsp;", " ")
           ?.trim(),
         link: item
           .match(/(?:<a(\s|\n)(.|\n)*href=").*(?:")/)?.[0]
@@ -37,7 +38,20 @@ export const dealListData = (data: string) => {
       };
     })
     .filter(Boolean);
-  // console.log(_list);
 
   return _list;
+};
+
+export const getOgUrlInfo = (data: string) => {
+  const url = data.match(/(?:og:url).*/)?.[0];
+  let isRedirect = false;
+  let title = "";
+  if (url?.includes("spelling")) {
+    isRedirect = true;
+    title = url.match(/title.+/)?.[0]?.replace(/(title=)|(&.*)/g, "") || "";
+  }
+  return {
+    isRedirect,
+    title,
+  };
 };

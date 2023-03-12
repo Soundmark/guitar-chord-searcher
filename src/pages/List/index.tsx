@@ -9,14 +9,16 @@ import Taro from "@tarojs/taro";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import "./index.less";
-import { dealListData } from "./utils";
+import { dealListData, getOgUrlInfo } from "./utils";
 
 let page = 1;
+// 处理重定向情况
+let isRedirect = false;
+let realTitle = "";
 
 export default function Index() {
   const { searchValue } = useSelector(indexModel.selector);
   const [list, setList] = useState<any[]>([]);
-  // const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [isFinished, setIsFinished] = useState(true);
 
@@ -25,8 +27,15 @@ export default function Index() {
       return new Promise((resolve, reject) => {
         setLoading(true);
         Taro.request({
-          url: `https://www.ultimate-guitar.com/search.php?title=${searchValue}&page=${page}&type=300`,
+          url: isRedirect
+            ? `https://www.ultimate-guitar.com/search.php?order=myweight&page=${page}&spelling=${searchValue}&tab_type_group=text&title=${realTitle}&type%5B1%5D=300`
+            : `https://www.ultimate-guitar.com/search.php?title=${searchValue}&page=${page}&type=300`,
           success: (res) => {
+            const ogurlInfo = getOgUrlInfo(res.data);
+            if (ogurlInfo.isRedirect) {
+              isRedirect = true;
+              realTitle = ogurlInfo.title;
+            }
             const _list = dealListData(res.data);
             if (!_list?.length || _list.length < 50) {
               setIsFinished(true);
@@ -52,6 +61,7 @@ export default function Index() {
   };
 
   useEffect(() => {
+    setIsFinished(false);
     fetchData();
   }, []);
 
@@ -74,6 +84,8 @@ export default function Index() {
           setIsFinished(false);
           setList([]);
           page = 1;
+          isRedirect = false;
+          realTitle = "";
           fetchData();
         }}
       ></Search>
@@ -98,6 +110,10 @@ export default function Index() {
             <View
               key={index}
               className="px-4 py-2 border-0 border-t border-solid border-gray-200"
+              onClick={() => {
+                indexModel.actions.update({ chordUrl: item.link });
+                Taro.navigateTo({ url: "/pages/Chord/index" });
+              }}
             >
               <View className="text-base">{item.song}</View>
               <View className="text-xs">artist: {item.artist}</View>
