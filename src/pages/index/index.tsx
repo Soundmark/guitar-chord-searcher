@@ -2,7 +2,8 @@ import { indexModel } from "@/models";
 import { Field, Icon } from "@antmjs/vantui";
 import { View } from "@tarojs/components";
 import Taro from "@tarojs/taro";
-import { useState } from "react";
+import FormData from "@zlyboy/wx-formdata/formData";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import ChordModal from "./ChordModal";
 import "./index.less";
@@ -28,10 +29,6 @@ export default function Index() {
       },
     },
     // {
-    //   title: "功德机",
-    //   key: "功",
-    // },
-    // {
     //   title: "设置",
     //   key: "设",
     //   onClick: () => {
@@ -39,6 +36,81 @@ export default function Index() {
     //   },
     // },
   ];
+
+  useEffect(() => {
+    const formData = new FormData();
+    formData.append("search_text", "陈奕迅");
+    Taro.request({
+      url: "https://chord4.com/search",
+      method: "POST",
+      data: { search_text: "陈奕迅" },
+      header: {
+        "content-type": "application/x-www-form-urlencoded",
+      },
+      success: (res) => {
+        let i = 0;
+        let data = res.data;
+        while (data.match(/<ol>/)) {
+          data = data
+            .replace(/<ol>/, `<ol${i}>`)
+            .replace(/<\/ol>/, `</ol${i}>`);
+          i++;
+        }
+        const [_songList, _artistList] = data
+          .match(/<ol(\d)>(.|\n)*<\/ol\1>/g)
+          .map((item) =>
+            item
+              .replace(/<\/*ol\d>/g, "")
+              .split(/<\/*li>/)
+              .filter((ele) => ele.includes("<a"))
+          );
+
+        const songList = _songList
+          .filter((item) => item.includes("(chord)"))
+          .map((item) => {
+            const [song, artist] = item.split("-");
+            return {
+              song: song.match(/title=".*"/)?.[0]?.replace(/(title=)|"/g, ""),
+              link: song
+                .match(/href=".*"\s/)?.[0]
+                ?.replace(/(href=)|("\s*)/g, ""),
+              artist: artist
+                .match(/title=".*"/)?.[0]
+                ?.replace(/(title=)|"/g, ""),
+            };
+          });
+        const artistList = _artistList.map((item) => ({
+          artist: item.match(/title=".*"/)?.[0]?.replace(/(title=)|"/g, ""),
+          link: item.match(/href=".*"\s/)?.[0]?.replace(/(href=)|("\s*)/g, ""),
+        }));
+        artistList.forEach((item) => {
+          Taro.request({
+            url: item.link,
+            method: "POST",
+            success: (res1) => {
+              const list = res1.data
+                .match(/<ol>(.|\n)*<\/ol>/)[0]
+                .replace(/<\/*ol>/, "")
+                .split(/<\/*li>/)
+                .filter((ele) => ele.includes("<a"));
+              list.forEach((ele) => {
+                songList.push({
+                  song: ele
+                    .match(/title=".*"/)?.[0]
+                    ?.replace(/(title=)|"/g, ""),
+                  artist: item.artist,
+                  link: ele
+                    .match(/href=".*"\s/)?.[0]
+                    ?.replace(/(href=)|("\s*)/g, ""),
+                });
+              });
+              console.log(songList);
+            },
+          });
+        });
+      },
+    });
+  }, []);
 
   return (
     <View className="h-full relative">
